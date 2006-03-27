@@ -1,0 +1,37 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvxSckTestApp", "MvxSckTestApp\MvxSckTestApp.csproj", "{51E845AF-52B5-4474-8D20-12BE3D4DB805}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvxSckCommander", "MvxSckCommander\MvxSckCommander.csproj", "{27ABB5A4-FF89-4B7F-8E51-22084730DDA6}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvxSck", "MvxSck\MvxSck.csproj", "{5EC252FA-5136-412C-B0E5-AEA54D11E2E0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{51E845AF-52B5-4474-8D20-12BE3D4DB805}.Debug.ActiveCfg = Debug|.NET
+		{51E845AF-52B5-4474-8D20-12BE3D4DB805}.Debug.Build.0 = Debug|.NET
+		{51E845AF-52B5-4474-8D20-12BE3D4DB805}.Release.ActiveCfg = Release|.NET
+		{51E845AF-52B5-4474-8D20-12BE3D4DB805}.Release.Build.0 = Release|.NET
+		{27ABB5A4-FF89-4B7F-8E51-22084730DDA6}.Debug.ActiveCfg = Debug|.NET
+		{27ABB5A4-FF89-4B7F-8E51-22084730DDA6}.Debug.Build.0 = Debug|.NET
+		{27ABB5A4-FF89-4B7F-8E51-22084730DDA6}.Release.ActiveCfg = Release|.NET
+		{27ABB5A4-FF89-4B7F-8E51-22084730DDA6}.Release.Build.0 = Release|.NET
+		{5EC252FA-5136-412C-B0E5-AEA54D11E2E0}.Debug.ActiveCfg = Debug|.NET
+		{5EC252FA-5136-412C-B0E5-AEA54D11E2E0}.Debug.Build.0 = Debug|.NET
+		{5EC252FA-5136-412C-B0E5-AEA54D11E2E0}.Release.ActiveCfg = Release|.NET
+		{5EC252FA-5136-412C-B0E5-AEA54D11E2E0}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
