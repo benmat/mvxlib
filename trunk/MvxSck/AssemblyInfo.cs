@@ -1,6 +1,6 @@
 /*
  *
- * MvxLib, an open source C# library for communication with Intentia Movex.
+ * MvxLib, an open source C# library used for communication with Intentia Movex.
  * http://mvxlib.sourceforge.net
  *
  * Copyright (C) 2005 - 2006  Mattias Bengtsson
@@ -24,7 +24,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("MvxSck")]
-[assembly: AssemblyDescription("Provides an API to communicate with Intentia Movex MI-programs via the FPW-service. A Microsoft .NET implementation/clone of MVXSOCKX_SVRLib.dll that only uses .NET managed code.")]
+[assembly: AssemblyDescription("A free C# implementation of MvxSockX. Provides an API to communicate with Intentia Movex MI-programs via the FPW-service.")]
 [assembly: AssemblyCompany("")]
 
 #if MONO

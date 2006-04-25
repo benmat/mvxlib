@@ -1,6 +1,6 @@
 /*
  *
- * MvxLib, an open source C# library for communication with Intentia Movex.
+ * MvxLib, an open source C# library used for communication with Intentia Movex.
  * http://mvxlib.sourceforge.net
  *
  * Copyright (C) 2005 - 2006  Mattias Bengtsson
@@ -28,7 +28,7 @@ using System.Reflection;
 namespace MvxLib
 {
 	/// <summary>
-	/// A Microsoft .NET implementation/clone of MVXSOCKX_SVRLib.dll. Uses only .NET native/managed code.
+	/// A free C# implementation of MvxSockX (from MVXSOCKX_SVRLib.dll).
 	/// </summary>
 	public class MvxSck
 	{
@@ -378,32 +378,6 @@ namespace MvxLib
 		/// <param name="message">Errormessage.</param>
 		public MvxSckException(string message) : base(message)
 		{
-		}
-	}
-
-	/// <summary>
-	/// Exception-types used in MvxSck when a CheckLength-error occures.
-	/// </summary>
-	public class MvxSckCheckLengthException : MvxSckException
-	{
-		private string _strReturnedMessage = "";
-
-		/// <summary>
-		/// The message-string returned from Movex at the time of the error.
-		/// </summary>
-		public string ReturnedMessage
-		{
-			get { return _strReturnedMessage; }
-		}
-
-		/// <summary>
-		/// An exception used when a checklength-error ocurres.
-		/// </summary>
-		/// <param name="errorMessage">The errormessage.</param>
-		/// <param name="returnMessage">The returned string.</param>
-		public MvxSckCheckLengthException(string errorMessage, string returnMessage) : base(errorMessage)
-		{
-			_strReturnedMessage = returnMessage;
 		}
 	}
 }
