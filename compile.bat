@@ -1,5 +1,5 @@
 ::
-:: MvxLib, an open source C# library for communication with Intentia Movex.
+:: MvxLib, an open source C# library used for communication with Intentia Movex.
 :: http://mvxlib.sourceforge.net
 ::
 :: Copyright (C) 2005 - 2006  Mattias Bengtsson
