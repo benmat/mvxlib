@@ -42,7 +42,7 @@ namespace MvxLib
 		/// </summary>
 		public event MvxSckTraceWriteHandler OnTraceWrite;
 
-		private System.Text.Encoding _objEncoding = System.Text.Encoding.GetEncoding("ISO-8859-1");
+		private static System.Text.Encoding _objEncoding = System.Text.Encoding.GetEncoding("ISO-8859-1");
 		private Socket		_objSocket		= null;
 		private bool		_blnLoggedIn	= false;
 		private IPEndPoint	_objIPEndPoint	= null;
@@ -321,7 +321,7 @@ namespace MvxLib
 		}
 
 		/// <summary>
-		/// Logging in to Movex. This must be done before sending commands. Throws an MvxSckException if unsuccessful.
+		/// Log in to Movex 10. This must be done before sending commands. Throws an MvxSckException if unsuccessful.
 		/// </summary>
 		/// <param name="strUsername">The username/login.</param>
 		/// <param name="strPassword">The password.</param>
@@ -341,9 +341,61 @@ namespace MvxLib
 			string strReceived = Execute(strCommand.ToUpper(), false);
 
 			if (strReceived != "Connection accepted")
-				throw new MvxSckException("Login not accepted.");
+				throw new MvxSckException("Login unsuccessful.", new Exception(strReceived));
 
 			_blnLoggedIn = true;
+		}
+
+		/// <summary>
+		/// Alpha! (untested)
+		/// Log in to Movex 12. This must be done before sending commands. Throws an MvxSckException if unsuccessful.
+		/// </summary>
+		/// <param name="strUsername">The username/login.</param>
+		/// <param name="strPassword">The password.</param>
+		/// <param name="strProgram">The MI-program to use.</param>
+		public void LoginMovex12(string strUsername, string strPassword, string strProgram)
+		{
+			if (_blnWriteTrace) WriteTrace(String.Format("Entering LoginMovex12(). Parameters: strUsername = {0}, strPassword = {1}, strProgram = {2}", strUsername, strPassword, strProgram));
+
+			string strCommand = "PWLOG" +
+				Environment.MachineName.PadRight(32) +
+				strUsername.PadRight(16) +
+				Movex12PasswordCipher(strPassword).PadRight(13) +
+				strProgram.PadRight(32);
+
+			string strReceived = Execute(strCommand.ToUpper(), false);
+
+			if (strReceived != "Connection accepted")
+				throw new MvxSckException("Login unsuccessful.", new Exception(strReceived));
+
+			_blnLoggedIn = true;
+		}
+
+		/// <summary>
+		/// Alpha! (untested)
+		/// Generates a Movex 12 compatible password.
+		/// </summary>
+		/// <param name="strPassword">The password in clear text.</param>
+		/// <returns>The ciphered password.</returns>
+		public static string Movex12PasswordCipher(string strPassword)
+		{
+			/*
+			 *
+			 * Movex 12 ciphers the password using a XOR swap algorithm.
+			 * The key starts at \x38 and increases one every char.
+			 *
+			 */
+
+			byte bytCiphKey = 38;
+			byte[] bytCiphPass = _objEncoding.GetBytes(strPassword);
+
+			for (int i = 0; i < strPassword.Length; i++)
+			{
+				bytCiphPass[i] ^= bytCiphKey;
+				bytCiphKey++;
+			}
+
+			return _objEncoding.GetString(bytCiphPass);
 		}
 
 		/// <summary>
@@ -377,6 +429,15 @@ namespace MvxLib
 		/// </summary>
 		/// <param name="message">Errormessage.</param>
 		public MvxSckException(string message) : base(message)
+		{
+		}
+		/// <summary>
+		/// Exception thrown from MvxSck.
+		/// </summary>
+		/// <param name="message">Errormessage.</param>
+		/// <param name="innerException">Inner exception, the exception that caused the outer exception.</param>
+		public MvxSckException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 	}
