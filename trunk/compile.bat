@@ -58,9 +58,15 @@ SET COMPILER=%WINDIR%\Microsoft.NET\Framework\%DOTNET_VERSION%\csc.exe /nologo
 
 :compile
 
+SET DEBUG=
+IF NOT "%2" == "debug" GOTO endset_debug
+SET DEBUG=/debug+
+
+:endset_debug
+
 ECHO.
-CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.MvxSck.dll /doc:Bin\MvxLib.MvxSck.xml MvxSck\*.cs
-CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.MvxSckCommander.dll MvxSckCommander\*.cs
+CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.MvxSck.dll /doc:Bin\MvxLib.MvxSck.xml MvxSck\*.cs %DEBUG%
+CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.MvxSckCommander.dll MvxSckCommander\*.cs %DEBUG%
 
 IF ERRORLEVEL 1 GOTO ERR
 
