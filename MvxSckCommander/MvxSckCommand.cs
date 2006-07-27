@@ -171,40 +171,18 @@ namespace MvxLib
 			}
 
 			return objCb.Command;
-			
-			/*
-			Transaktion.... GetPriceMLine                     
-			Beskrivning.... Get Price Line Multi             
-			Ben..  Fpo Tps Lgd Ftp  Oi.   
-			                    
-			Inledande 'fast' del - denna är gemansam för ariklarna.   
-			CONO    16  18   3  N   1  Company               
-			FACI    19  21   3  A   1  Facility               
-			CUNO    22  31  10  A   1  Customer No           
-			ORDT    32  41  10  N   1  Order date             
-			CUCD    42  44   3  A      Currency               
-			ORTP    45  47   3  A   1  Order type             
-			PRRF    48  49   2  A      Price list             
-			DISY    50  59  10  A      Discount model         
-			DWDT    60  69  10  N      Date     
-			occurs 40 times -------------------- 
-			ITNO    70  84  15  A      Item No               
-			WHLO    85  87   3  A      Warehouse             
-			ORQA    88 103  16  N      Quantity               
-			ALUN   104 106   3  A      Unit of mes 
-			ITNO   107 und so weiter     
-			----------------------------------- 
+		}
 
-			Output: 
-			ITNO    16  30  15  A      Item No                     
-			SAPR    31  45  15  N      sales price @               
-			LNAM    46  60  15  N      Line amount                 
-			ORQA    61  75  15  N      Order quantity             
-			PRRF    76  77   2  A      Price list                 
-			STAF    78  78   1  N      Scaled pricelist 1=yes     
-			ERCD    79  79   1  N      Error code 1=err           
-			ITNO    80 und so weiter 
-			*/
+		public static string GetLastOrderErrorMessage(
+			int			intCompany,
+			string		strTemporaryOrderNumber
+			)
+		{
+			MvxSckCommandBuilder objCb = new MvxSckCommandBuilder("LstErrMsgOrder");
+			objCb.Add(intCompany, 3);
+			objCb.Add(strTemporaryOrderNumber, 7);
+
+			return objCb.Command;
 		}
 	}
 }

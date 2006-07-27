@@ -47,10 +47,13 @@ namespace MvxLib
 
 		public static PriceItem GetPriceItem(string strCommandReturn)
 		{
-			string strPrice				= strCommandReturn.Substring(69, 10).Trim();
-			string strStaggerQuantity	= strCommandReturn.Substring(87, 3).Trim();
+			MvxSckReturnBuilder objRb = new MvxSckReturnBuilder(strCommandReturn);
+			objRb.GetString(69);
+			double dblPrice = objRb.GetDouble(10);
+			objRb.GetString(8);
+			int intStaggerQuantity = objRb.GetInt(3);
 
-			return new PriceItem(ParseDouble(strPrice), ParseInt(strStaggerQuantity, 1), (strPrice == ""));
+			return new PriceItem(dblPrice, intStaggerQuantity == 0 ? 1 : intStaggerQuantity, objRb.ReturnValues[1] == "");
 		}
 
 		public struct PriceLineItem
@@ -70,8 +73,11 @@ namespace MvxLib
 
 		public static PriceLineItem GetPriceLineItem(string strCommandReturn)
 		{
-			string strPrice = strCommandReturn.Substring(18, 15).Trim();
-			return new PriceLineItem(ParseDouble(strPrice), (strPrice == ""));
+			MvxSckReturnBuilder objRb = new MvxSckReturnBuilder(strCommandReturn);
+			objRb.GetString(18);
+			double dblPrice = objRb.GetDouble(15);
+
+			return new PriceLineItem(dblPrice, objRb.ReturnValues[1] == "");
 		}
 
 		public struct PriceMLineItem
@@ -111,18 +117,18 @@ namespace MvxLib
 		{
 			ArrayList arrReturnItems = new ArrayList();
 			MvxSckReturnBuilder objRb = new MvxSckReturnBuilder(strCommandReturn.Trim());
-			objRb.Add(15); // Return code
+			objRb.GetString(15); // Return code
 
 			while (objRb.CommandStringLeft != "FINITO" && objRb.CommandStringLeft.Length > 0)
 			{
-				string strItemNumber		= objRb.Add(15);
-				bool blnEmptyPrice			= (objRb.CommandStringLeft.Substring(0, 15).Trim() == "");
-				double dblPrice				= ParseDouble(objRb.Add(15));
-				double dblLineAmount		= ParseDouble(objRb.Add(15));
-				double dblOrderQuantity		= ParseDouble(objRb.Add(15));
-				string strPricelist			= objRb.Add(2);
-				bool blnScaledPricelist		= ParseBool(objRb.Add(1));
-				bool blnError				= ParseBool(objRb.Add(1));
+				string strItemNumber		= objRb.GetString(15);
+				bool blnEmptyPrice			= objRb.CommandStringLeft.Substring(0, 15).Trim() == "";
+				double dblPrice				= objRb.GetDouble(15);
+				double dblLineAmount		= objRb.GetDouble(15);
+				double dblOrderQuantity		= objRb.GetDouble(15);
+				string strPricelist			= objRb.GetString(2);
+				bool blnScaledPricelist		= objRb.GetBool();
+				bool blnError				= objRb.GetBool();
 
 				arrReturnItems.Add(new PriceMLineItem(
 					strItemNumber,
@@ -137,37 +143,6 @@ namespace MvxLib
 			}
 
 			return (PriceMLineItem[]) arrReturnItems.ToArray(typeof(PriceMLineItem));
-		}
-
-		private static double ParseDouble(string strInstring)
-		{
-			if (strInstring == "")
-				return (double) 0;
-
-			return Convert.ToDouble(ReplaceDecimalSeperator(strInstring));
-		}
-
-		private static bool ParseBool(string strInstring)
-		{
-			if (strInstring == "1")
-				return true;
-			else
-				return false;
-		}
-
-		private static int ParseInt(string strInstring, int intDefault)
-		{
-			if (strInstring.Trim() == "")
-				return intDefault;
-
-			return Convert.ToInt32(strInstring);
-		}
-
-		private static string ReplaceDecimalSeperator(string strInstring)
-		{
-			string strCurrentDecimal = System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
-
-			return strInstring.Replace(",", strCurrentDecimal).Replace(".", strCurrentDecimal);
 		}
 	}
 }

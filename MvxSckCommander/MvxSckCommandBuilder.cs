@@ -35,7 +35,7 @@ namespace MvxLib
 
 		public MvxSckCommandBuilder(string strApplication)
 		{
-			int intApplicationLength = 15;
+			const int intApplicationLength = 15;
 
 			if (strApplication.Length > intApplicationLength)
 				throw new Exception("Application-string is longer than allowed.");
@@ -53,12 +53,19 @@ namespace MvxLib
 
 		public void Add(int intParameter, int intLength)
 		{
-			_strCommand += intParameter.ToString().PadRight(intLength, ' ');
+			Add(intParameter.ToString(), intLength);
 		}
 
 		public void Add(DateTime dtDate)
 		{
-			_strCommand += dtDate.ToString("yyyyMMdd").PadRight(10, ' ');
+			Add(dtDate.ToString("yyyyMMdd"), 10);
+		}
+
+		public void Add(double dblParameter, int intLength)
+		{
+			const int intPrecision = 6;
+
+			Add(dblParameter.ToString("0." + string.Empty.PadRight(intPrecision, '#'), System.Globalization.CultureInfo.InvariantCulture), intLength);
 		}
 	}
 }
