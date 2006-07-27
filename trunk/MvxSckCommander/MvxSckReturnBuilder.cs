@@ -48,15 +48,40 @@ namespace MvxLib
 			_intCurPos = 0;
 		}
 
-		public string Add(int intLength)
+		public string GetString(int intLength)
 		{
 			string strReturn = _strCommandReturnString.Substring(_intCurPos, intLength).Trim();
-
-			_objReturnValues.Add(strReturn);
-
 			_intCurPos += intLength;
-
+			_objReturnValues.Add(strReturn);
 			return strReturn;
+		}
+
+		public double GetDouble(int intLength)
+		{
+			string strReturn = GetString(intLength);
+
+			if (strReturn == "")
+				return 0;
+
+			return Convert.ToDouble(strReturn, System.Globalization.CultureInfo.InvariantCulture);
+		}
+
+		public bool GetBool()
+		{
+			if (GetString(1) == "1")
+				return true;
+			else
+				return false;
+		}
+
+		public int GetInt(int intLength)
+		{
+			string strReturn = GetString(intLength);
+
+			if (strReturn == "")
+				return 0;
+
+			return Convert.ToInt32(strReturn);
 		}
 	}
 }
