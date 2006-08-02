@@ -222,16 +222,19 @@ namespace MvxLib
 		{
 			if (_blnWriteTrace) WriteTrace("Entering Close().");
 
+			_blnLoggedIn = false;
+
+			if (_objSocket == null)
+				return;
+
+			if (!_objSocket.Connected)
+				return;
+
 			if (_blnLoggedIn)
 				Execute("CLOSE", true);
 
-			if (_objSocket.Connected)
-			{
-				if (_blnWriteTrace) WriteTrace("Closing Socket.");
-				_objSocket.Close();
-			}
-
-			_blnLoggedIn = false;
+			if (_blnWriteTrace) WriteTrace("Closing Socket.");
+			_objSocket.Close();
 		}
 
 		/// <summary>
@@ -249,12 +252,18 @@ namespace MvxLib
 			if (_blnWriteTrace) WriteTrace("Entering Execute(). Parameters: strCommand = <" + strCommand + ">, blnCheckLogin = " + blnCheckLogin.ToString() + ".");
 
 			if (_objSocket != null)
-				if (!_objSocket.Connected)
-				{
-					MvxSckException ex = new MvxSckException("Socket is not connected.");
-					if (_blnWriteTrace) WriteTrace(ex);
-					throw ex;
-				}
+			{
+				MvxSckException ex = new MvxSckException("Socket is not constructed.");
+				if (_blnWriteTrace) WriteTrace(ex);
+				throw ex;
+			}
+
+			if (!_objSocket.Connected)
+			{
+				MvxSckException ex = new MvxSckException("Socket is not connected.");
+				if (_blnWriteTrace) WriteTrace(ex);
+				throw ex;
+			}
 
 			if (blnCheckLogin && !_blnLoggedIn)
 			{
