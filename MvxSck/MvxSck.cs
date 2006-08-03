@@ -251,7 +251,7 @@ namespace MvxLib
 		{
 			if (_blnWriteTrace) WriteTrace("Entering Execute(). Parameters: strCommand = <" + strCommand + ">, blnCheckLogin = " + blnCheckLogin.ToString() + ".");
 
-			if (_objSocket != null)
+			if (_objSocket == null)
 			{
 				MvxSckException ex = new MvxSckException("Socket is not constructed.");
 				if (_blnWriteTrace) WriteTrace(ex);
