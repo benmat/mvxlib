@@ -120,14 +120,14 @@ namespace MvxLib
 		{
 			public string	ItemNumber;
 			public string	Wharehouse;
-			public int		Quantity;
+			public double	Quantity;
 			public string	UnitOfMeasure;
 
-			public GetPriceMLineItem(string strItemNumber, string strWharehouse, int intQuantity, string strUnitOfMeasure)
+			public GetPriceMLineItem(string strItemNumber, string strWharehouse, double dblQuantity, string strUnitOfMeasure)
 			{
 				this.ItemNumber		= strItemNumber;
 				this.Wharehouse		= strWharehouse;
-				this.Quantity		= intQuantity;
+				this.Quantity		= dblQuantity;
 				this.UnitOfMeasure	= strUnitOfMeasure;
 			}
 		}
