@@ -33,7 +33,7 @@ namespace MvxLib
 
 		public string[] ReturnValues
 		{
-			get { return (string[]) _objReturnValues.ToArray(); }
+			get { return (string[]) _objReturnValues.ToArray(typeof(string)); }
 		}
 
 		public string CommandStringLeft
