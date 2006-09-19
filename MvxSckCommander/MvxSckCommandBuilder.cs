@@ -26,46 +26,52 @@ namespace MvxLib
 {
 	public class MvxSckCommandBuilder
 	{
-		private string _strCommand;
+		private string _command;
 
 		public string Command
 		{
-			get { return _strCommand; }
+			get { return _command; }
 		}
 
-		public MvxSckCommandBuilder(string strApplication)
+		public MvxSckCommandBuilder(string program)
 		{
-			const int intApplicationLength = 15;
+			const int PROGRAM_LENGTH = 15;
 
-			if (strApplication.Length > intApplicationLength)
+			if (program.Length > PROGRAM_LENGTH)
 				throw new Exception("Application-string is longer than allowed.");
 
-			_strCommand = strApplication.PadRight(intApplicationLength, ' ');
+			_command = program.PadRight(PROGRAM_LENGTH, ' ');
 		}
 
-		public void Add(string strParameter, int intLength)
+		public void Add(string parameter, int length)
 		{
-			if (strParameter.Length > intLength)
-				throw new Exception("Parameter-string is longer than allowed. " + strParameter + " is " + strParameter.Length.ToString() + " characters long, only " + intLength.ToString() + " is allowed.");
+			if (parameter.Length > length)
+				throw new Exception("Parameter-string is longer than allowed. " + parameter + " is " + parameter.Length.ToString() + " characters long, only " + length.ToString() + " is allowed.");
 
-			_strCommand += strParameter.PadRight(intLength, ' ');
+			_command += parameter.PadRight(length, ' ');
 		}
 
-		public void Add(int intParameter, int intLength)
+		public void Add(int parameter, int length)
 		{
-			Add(intParameter.ToString(), intLength);
+			Add(parameter.ToString(), length);
 		}
 
-		public void Add(DateTime dtDate)
+		public void Add(DateTime parameter)
 		{
-			Add(dtDate.ToString("yyyyMMdd"), 10);
+			Add(parameter.ToString("yyyyMMdd"), 10);
 		}
 
-		public void Add(double dblParameter, int intLength)
+		public void Add(double parameter, int length)
 		{
-			const int intPrecision = 6;
+			if (parameter == double.NaN)
+			{
+				Add(string.Empty, length);
+				return;
+			}
 
-			Add(dblParameter.ToString("0." + string.Empty.PadRight(intPrecision, '#'), System.Globalization.CultureInfo.InvariantCulture), intLength);
+			const int NUMERIC_PRECISION = 6;
+
+			Add(parameter.ToString("0." + string.Empty.PadRight(NUMERIC_PRECISION, '#'), System.Globalization.CultureInfo.InvariantCulture), length);
 		}
 	}
 }

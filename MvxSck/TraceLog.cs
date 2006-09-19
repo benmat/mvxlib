@@ -29,15 +29,15 @@ namespace MvxLib
 	/// </summary>
 	public class TraceLog
 	{
-		private System.Collections.ArrayList _objTraceLogEntries = new System.Collections.ArrayList();
-		private long _lngLastTraceTicks = DateTime.Now.Ticks;
+		private System.Collections.ArrayList _entries = new System.Collections.ArrayList();
+		private long previous_tick = DateTime.Now.Ticks;
 
 		/// <summary>
-		/// Returns an array of all TraceLogEntries.
+		/// Returns an array of all TraceLog entries.
 		/// </summary>
-		public TraceLogEntry[] TraceLogEntries
+		public TraceLogEntry[] Entries
 		{
-			get { return (TraceLogEntry[]) _objTraceLogEntries.ToArray(typeof (TraceLogEntry)); }
+			get { return (TraceLogEntry[]) _entries.ToArray(typeof (TraceLogEntry)); }
 		}
 
 		/// <returns>All TraceLogEntries concatenated.</returns>
@@ -45,8 +45,8 @@ namespace MvxLib
 		{
 			string strReturn = string.Empty;
 
-			for (int i = 0; i < TraceLogEntries.Length; i++)
-				strReturn += TraceLogEntries[i].ToString() + Environment.NewLine;
+			for (int i = 0; i < Entries.Length; i++)
+				strReturn += Entries[i].ToString() + Environment.NewLine;
 
 			return strReturn;
 		}
@@ -54,11 +54,11 @@ namespace MvxLib
 		/// <summary>
 		/// Add a TraceLogEntry to the log.
 		/// </summary>
-		/// <param name="strMessage">The message of the trace.</param>
-		public void WriteTrace(string strMessage)
+		/// <param name="message">The message of the trace.</param>
+		public void WriteTrace(string message)
 		{
-			_objTraceLogEntries.Add(new TraceLogEntry(strMessage, DateTime.Now.Ticks - _lngLastTraceTicks));
-			_lngLastTraceTicks = DateTime.Now.Ticks;
+			_entries.Add(new TraceLogEntry(message, DateTime.Now.Ticks - previous_tick));
+			previous_tick = DateTime.Now.Ticks;
 		}
 
 		/// <summary>
@@ -76,25 +76,25 @@ namespace MvxLib
 		public struct TraceLogEntry
 		{
 			DateTime	TimeOfEntry;
-			long		TicksSinceLastEntry;
+			long		ElapsedTicks;
 			string		Message;
 
 			/// <summary>
 			/// Enter an entry to the log.
 			/// </summary>
-			/// <param name="strMessage">Message of the entry.</param>
-			/// <param name="lngTicksSinceLastEntry">Ticks elapsed since the last log was entered.</param>
-			public TraceLogEntry(string strMessage, long lngTicksSinceLastEntry)
+			/// <param name="message">Message of the entry.</param>
+			/// <param name="elapsed_ticks">Ticks elapsed since the last log was entered.</param>
+			public TraceLogEntry(string message, long elapsed_ticks)
 			{
-				TimeOfEntry			= DateTime.Now;
-				TicksSinceLastEntry	= lngTicksSinceLastEntry;
-				Message				= strMessage;
+				TimeOfEntry		= DateTime.Now;
+				ElapsedTicks	= elapsed_ticks;
+				Message			= message;
 			}
 
 			/// <returns>A string suitable for storing.</returns>
 			public override string ToString()
 			{
-				return TimeOfEntry.ToString() + " " + TicksSinceLastEntry.ToString().PadRight(10) + Message;
+				return TimeOfEntry.ToString() + " " + ElapsedTicks.ToString().PadRight(10) + Message;
 			}
 		}
 	}
