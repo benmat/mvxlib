@@ -42,15 +42,16 @@ namespace MvxLib
 		/// </summary>
 		public event MvxSckTraceWriteHandler OnTraceWrite;
 
-		private static System.Text.Encoding _objEncoding = System.Text.Encoding.GetEncoding("ISO-8859-1");
-		private Socket		_objSocket		= null;
-		private bool		_blnLoggedIn	= false;
-		private IPEndPoint	_objIPEndPoint	= null;
-		private string		_strServer		= null;
-		private int			_intPort		= 0;
-		
-		private TraceLog	_objTraceLog	= new TraceLog();
-		private bool		_blnWriteTrace	= false;
+		private static System.Text.Encoding _encoding = System.Text.Encoding.GetEncoding("ISO-8859-1");
+		private Socket		_socket			= null;
+		private bool		_logged_in		= false;
+		private IPEndPoint	_host			= null;
+		private string		_server			= null;
+		private int			_port			= 0;
+		private const int	RECEIVE_TIMEOUT	= 30000;
+		private const int	SEND_TIMEOUT	= 2000;
+		private TraceLog	_tracelog		= new TraceLog();
+		private bool		_write_tracelog	= false;
 
 		/// <summary>
 		/// The method used when the OnTraceWrite is called.
@@ -66,7 +67,27 @@ namespace MvxLib
 		/// </summary>
 		public bool LoggedIn
 		{
-			get { return _blnLoggedIn; }
+			get { return _logged_in; }
+		}
+
+		/// <summary>
+		/// Gets or sets the timeout for the amount of milliseconds to wait
+		/// for Movex to return a value.
+		/// </summary>
+		public int Timeout
+		{
+			get
+			{
+				if (_socket != null)
+					return _socket.ReceiveTimeout;
+				else
+					return RECEIVE_TIMEOUT;
+			}
+			set
+			{
+				if (_socket != null)
+					_socket.ReceiveTimeout = value;
+			}
 		}
 
 		/// <summary>
@@ -74,7 +95,7 @@ namespace MvxLib
 		/// </summary>
 		public TraceLog TraceLog
 		{
-			get { return _objTraceLog; }
+			get { return _tracelog; }
 		}
 
 		/// <summary>
@@ -82,8 +103,8 @@ namespace MvxLib
 		/// </summary>
 		public bool WriteTraceLog
 		{
-			get { return _blnWriteTrace; }
-			set { _blnWriteTrace = value; }
+			get { return _write_tracelog; }
+			set { _write_tracelog = value; }
 		}
 
 		/// <summary>
@@ -101,25 +122,25 @@ namespace MvxLib
 		/// <summary>
 		/// Constructor. Use the constructor with IPEndPoint as parameter if possible since this will retrive IP-addresses from DNS when Connect()ing.
 		/// </summary>
-		/// <param name="strServer">Movex' server/host/computer-name.</param>
-		/// <param name="intPort">The corresponding port the "RPG"-service/daemon listens to.</param>
-		public MvxSck(string strServer, int intPort)
+		/// <param name="server">Movex' server/host/computer-name.</param>
+		/// <param name="port">The corresponding port the "RPG"-service/daemon listens to.</param>
+		public MvxSck(string server, int port)
 		{
-			WriteTrace(String.Format("Constructing MvxSck {0}. Parameters: strServer = {1}, intPort = {2}.", this.Version, strServer, intPort));
+			WriteTrace(String.Format("Constructing MvxSck {0}. Parameters: strServer = {1}, intPort = {2}.", this.Version, server, port), true);
 
-			_strServer	= strServer;
-			_intPort	= intPort;
+			_server = server;
+			_port = port;
 		}
 
 		/// <summary>
 		/// Constructor.
 		/// </summary>
-		/// <param name="objIPEndPoint">Movex IP-number and port.</param>
-		public MvxSck(IPEndPoint objIPEndPoint)
+		/// <param name="host">Movex IP-number and port.</param>
+		public MvxSck(IPEndPoint host)
 		{
-			WriteTrace(String.Format("Constructing MvxSck {0}. Parameters: objIPEndPoint = {1}.", this.Version, objIPEndPoint));
+			WriteTrace(String.Format("Constructing MvxSck {0}. Parameters: objIPEndPoint = {1}.", this.Version, host), true);
 
-			_objIPEndPoint = objIPEndPoint;
+			_host = host;
 		}
 
 		/// <summary>
@@ -127,69 +148,72 @@ namespace MvxLib
 		/// </summary>
 		public void Connect()
 		{
-			if (_blnWriteTrace) WriteTrace("Entering Connect().");
+			WriteTrace("Entering Connect().");
 
-			if (_objSocket != null)
-				if (_objSocket.Connected)
+			if (_socket != null)
+				if (_socket.Connected)
 				{
 					MvxSckException ex = new MvxSckException("Socket is already connected.");
-					if (_blnWriteTrace) WriteTrace(ex);
+					WriteTrace(ex);
 					throw ex;
 				}
 
-			CreateSocketObject();
+			WriteTrace("Constructing Socket-object.");
 
-			if (_objIPEndPoint != null)
+			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			_socket.SendTimeout = SEND_TIMEOUT;
+			_socket.ReceiveTimeout = RECEIVE_TIMEOUT;
+
+			if (_host != null)
 			{
-				if (_blnWriteTrace) WriteTrace("Attempting to connect socket.");
+				WriteTrace("Attempting to connect socket.");
 
-				_objSocket.Connect(_objIPEndPoint);
+				_socket.Connect(_host);
 
-				if (!_objSocket.Connected)
+				if (!_socket.Connected)
 				{
 					MvxSckException ex = new MvxSckException("Unable to connect socket.");
-					if (_blnWriteTrace) WriteTrace(ex);
+					WriteTrace(ex);
 					throw ex;
 				}
 				
-				if (_blnWriteTrace) WriteTrace("Socket connected successfully.");
+				WriteTrace("Socket connected successfully.");
 			}
-			else if (_strServer != null && _intPort != 0)
+			else if (_server != null && _port != 0)
 			{
-				if (_blnWriteTrace) WriteTrace("Resolving IP-addresses for " + _strServer + ".");
+				WriteTrace("Resolving IP-addresses for " + _server + ".");
 
 #if MONO
-				IPHostEntry objHostEntry = Dns.GetHostByName(_strServer);
-				IPAddress[] objIPaddresses = objHostEntry.AddressList;
+				IPAddress[] ip_addresses = Dns.GetHostByName(_server).AddressList;
 #elif NET_2_0
-				IPAddress[] objIPaddresses = Dns.GetHostAddresses(_strServer);
+				IPAddress[] ip_addresses = Dns.GetHostAddresses(_server);
 #else
-				IPAddress[] objIPaddresses = Dns.Resolve(_strServer).AddressList;
+				IPAddress[] ip_addresses = Dns.Resolve(_server).AddressList;
 #endif
 
-				if (_blnWriteTrace) WriteTrace(objIPaddresses.Length + " IP-addresse(s) found.");
+				WriteTrace(ip_addresses.Length + " IP-addresse(s) found.");
 
-				for (int i = 0; i < objIPaddresses.Length; i++)
+				for (int i = 0; i < ip_addresses.Length; i++)
 				{
-					if (_blnWriteTrace) WriteTrace("Trying to connect to " + objIPaddresses[i].ToString() + ".");
+					WriteTrace("Trying to connect to " + ip_addresses[i].ToString() + ".");
 
-					_objSocket.Connect(new IPEndPoint(objIPaddresses[i], _intPort));
+					_socket.Connect(new IPEndPoint(ip_addresses[i], _port));
 
-					if (_objSocket.Connected)
+					if (_socket.Connected)
 					{
-						if (_blnWriteTrace) WriteTrace("Socket connected successfully.");
+						WriteTrace("Socket connected successfully.");
 						return;
 					}
 				}
 
 				MvxSckException ex = new MvxSckException("Did not find any connectable servers.");
-				if (_blnWriteTrace) WriteTrace(ex);
+				WriteTrace(ex);
 				throw ex;
 			}
 			else
 			{
-				MvxSckException ex = new MvxSckException("IPEndPoint, Server or Port not configured.");
-				if (_blnWriteTrace) WriteTrace(ex);
+				MvxSckException ex = new MvxSckException("host, server or port not configured.");
+				WriteTrace(ex);
 				throw ex;
 			}
 		}
@@ -199,20 +223,8 @@ namespace MvxLib
 		/// </summary>
 		~MvxSck()
 		{
-			if (_objSocket == null)
-				return;
-
-			if (_objSocket.Connected)
-				Close();
-
-			_objSocket = null;
-		}
-
-		private void CreateSocketObject()
-		{
-			if (_blnWriteTrace) WriteTrace("Constructing Socket-object.");
-
-			_objSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			Close();
+			_socket = null;
 		}
 
 		/// <summary>
@@ -220,111 +232,112 @@ namespace MvxLib
 		/// </summary>
 		public void Close()
 		{
-			if (_blnWriteTrace) WriteTrace("Entering Close().");
+			WriteTrace("Entering Close().");
 
-			_blnLoggedIn = false;
-
-			if (_objSocket == null)
+			if (_socket == null)
 				return;
 
-			if (!_objSocket.Connected)
+			if (!_socket.Connected)
 				return;
 
-			if (_blnLoggedIn)
+			if (_logged_in)
 				Execute("CLOSE", true);
 
-			if (_blnWriteTrace) WriteTrace("Closing Socket.");
-			_objSocket.Close();
+			_logged_in = false;
+
+			WriteTrace("Closing Socket.");
+
+			_socket.Close();
 		}
 
 		/// <summary>
 		/// Executing a command at the current MI-program.
 		/// </summary>
-		/// <param name="strCommand">The commandstring.</param>
+		/// <param name="command">The commandstring.</param>
 		/// <returns>The string returned from Movex.</returns>
-		public string Execute(string strCommand)
+		public string Execute(string command)
 		{
-			return Execute(strCommand, true);
+			return Execute(command, true);
 		}
 
-		private string Execute(string strCommand, bool blnCheckLogin)
+		private string Execute(string command, bool check_login)
 		{
-			if (_blnWriteTrace) WriteTrace("Entering Execute(). Parameters: strCommand = <" + strCommand + ">, blnCheckLogin = " + blnCheckLogin.ToString() + ".");
+			WriteTrace("Entering Execute(). Parameters: strCommand = <" + command + ">, blnCheckLogin = " + check_login.ToString() + ".");
 
-			if (_objSocket == null)
+			if (_socket == null)
 			{
 				MvxSckException ex = new MvxSckException("Socket is not constructed.");
-				if (_blnWriteTrace) WriteTrace(ex);
+				WriteTrace(ex);
 				throw ex;
 			}
 
-			if (!_objSocket.Connected)
+			if (!_socket.Connected)
 			{
 				MvxSckException ex = new MvxSckException("Socket is not connected.");
-				if (_blnWriteTrace) WriteTrace(ex);
+				WriteTrace(ex);
 				throw ex;
 			}
 
-			if (blnCheckLogin && !_blnLoggedIn)
+			if (check_login && !_logged_in)
 			{
 				MvxSckException ex = new MvxSckException("Cannot run command because not logged in.");
-				if (_blnWriteTrace) WriteTrace(ex);
+				WriteTrace(ex);
 				throw ex;
 			}
 
-			if (strCommand != null)
+			if (command != null)
 			{
-				byte[] baSend = AddCommandLengthPrefix(strCommand);
+				byte[] baSend = AddCommandLengthPrefix(command);
 			
-				if (_blnWriteTrace) WriteTrace("Sending command through socket.");
+				WriteTrace("Sending command through socket.");
 
-				_objSocket.Send(baSend, baSend.Length, SocketFlags.None);
+				_socket.Send(baSend, baSend.Length, SocketFlags.None);
 			}
 
-			int intBytesRecieved = 0, intTotalBytesReceived = 0;
-			int intBytesToExpect = 0, i = 0;
-			byte[] baBuffer = new byte[4];
-			string strReceived = string.Empty;
+			int count_received = 0, count_total_received = 0;
+			int count_expected = 0, i = 0;
+			byte[] buffer = new byte[4];
+			string received = string.Empty;
 
-			if (_blnWriteTrace) WriteTrace("Beginning to receive data.");
+			WriteTrace("Beginning to receive data.");
 
 			do 
 			{
-				intBytesRecieved = _objSocket.Receive(baBuffer, baBuffer.Length, 0);
-				strReceived += _objEncoding.GetString(baBuffer, 0, intBytesRecieved);
+				count_received = _socket.Receive(buffer, buffer.Length, 0);
+				received += _encoding.GetString(buffer, 0, count_received);
 				
-				intTotalBytesReceived += intBytesRecieved;
+				count_total_received += count_received;
 
-				if (i == 0 && intBytesRecieved >= 4)
-					intBytesToExpect = baBuffer[2] * 256 + baBuffer[3] + 4;
+				if (i == 0 && count_received >= 4)
+					count_expected = buffer[2] * 256 + buffer[3] + 4;
 				
-				if (intBytesToExpect == 0)
+				if (count_expected == 0)
 					return null;
 
 				i++;
 				
-				if (_blnWriteTrace) WriteTrace(String.Format("Iteration {0}. Recieved {1} bytes (total {2} bytes so far), expecting {3} bytes total.", i, intBytesRecieved, intTotalBytesReceived, intBytesToExpect));
+				WriteTrace(String.Format("Iteration {0}. Recieved {1} bytes (total {2} bytes so far), expecting {3} bytes total.", i, count_received, count_total_received, count_expected));
 				
-				baBuffer = new byte[intBytesToExpect - 4];
+				buffer = new byte[count_expected - 4];
 			}
-			while (intBytesToExpect > intTotalBytesReceived);
+			while (count_expected > count_total_received);
 
-			return strReceived.Substring(4);
+			return received.Substring(4);
 		}
 
 		/// <summary>
 		/// Adds CheckLength-bytes in the beginning of the command before sending it to Movex.
 		/// </summary>
-		/// <param name="strCommand">The command without CheckLength-bytes.</param>
+		/// <param name="command">The command without CheckLength-bytes.</param>
 		/// <returns>The command with CheckLength-bytes.</returns>
-		private byte[] AddCommandLengthPrefix(string strCommand)
+		private byte[] AddCommandLengthPrefix(string command)
 		{
-			if (_blnWriteTrace) WriteTrace("Entering AddCommandLengthPrefix().");
+			WriteTrace("Entering AddCommandLengthPrefix().");
 
-			byte[] bcCommand = _objEncoding.GetBytes("\x00\x00\x01\x01" + strCommand);
+			byte[] bcCommand = _encoding.GetBytes("\x00\x00\x01\x01" + command);
 
-			bcCommand[2] = Convert.ToByte(strCommand.Length / 256);
-			bcCommand[3] = Convert.ToByte(strCommand.Length % 256);
+			bcCommand[2] = Convert.ToByte(command.Length / 256);
+			bcCommand[3] = Convert.ToByte(command.Length % 256);
 
 			return bcCommand;
 		}
@@ -332,61 +345,61 @@ namespace MvxLib
 		/// <summary>
 		/// Log in to Movex 10. This must be done before sending commands. Throws an MvxSckException if unsuccessful.
 		/// </summary>
-		/// <param name="strUsername">The username/login.</param>
-		/// <param name="strPassword">The password.</param>
-		/// <param name="strLibrary">The library in Movex where the Program resides.</param>
-		/// <param name="strProgram">The MI-program to use.</param>
-		public void Login(string strUsername, string strPassword, string strLibrary, string strProgram)
+		/// <param name="username">The username/login.</param>
+		/// <param name="password">The password.</param>
+		/// <param name="library">The library in Movex where the Program resides.</param>
+		/// <param name="program">The MI-program to use.</param>
+		public void Login(string username, string password, string library, string program)
 		{
-			if (_blnWriteTrace) WriteTrace(String.Format("Entering Login(). Parameters: strUsername = {0}, strPassword = {1}, strLibrary = {2}, strProgram = {3}", strUsername, strPassword, strLibrary, strProgram));
+			WriteTrace(String.Format("Entering Login(). Parameters: username = {0}, password = {1}, library = {2}, program = {3}", username, password, library, program));
 
 			string strCommand = "LOGON" + 
 				Environment.MachineName.PadRight(32) +
-				strUsername.PadRight(16) +
-				strPassword.PadRight(16) +
-				(strLibrary + "/" + strProgram).PadRight(32) +
-				strProgram.PadRight(32);
+				username.PadRight(16) +
+				password.PadRight(16) +
+				(library + "/" + program).PadRight(32) +
+				program.PadRight(32);
 
 			string strReceived = Execute(strCommand.ToUpper(), false);
 
 			if (strReceived != "Connection accepted")
 				throw new MvxSckException("Login unsuccessful.", new Exception(strReceived));
 
-			_blnLoggedIn = true;
+			_logged_in = true;
 		}
 
 		/// <summary>
 		/// Alpha! (untested)
 		/// Log in to Movex 12. This must be done before sending commands. Throws an MvxSckException if unsuccessful.
 		/// </summary>
-		/// <param name="strUsername">The username/login.</param>
-		/// <param name="strPassword">The password.</param>
-		/// <param name="strProgram">The MI-program to use.</param>
-		public void LoginMovex12(string strUsername, string strPassword, string strProgram)
+		/// <param name="username">The username/login.</param>
+		/// <param name="password">The password.</param>
+		/// <param name="program">The MI-program to use.</param>
+		public void LoginMovex12(string username, string password, string program)
 		{
-			if (_blnWriteTrace) WriteTrace(String.Format("Entering LoginMovex12(). Parameters: strUsername = {0}, strPassword = {1}, strProgram = {2}", strUsername, strPassword, strProgram));
+			WriteTrace(String.Format("Entering LoginMovex12(). Parameters: username = {0}, password = {1}, program = {2}", username, password, program));
 
 			string strCommand = "PWLOG" +
 				Environment.MachineName.PadRight(32) +
-				strUsername.PadRight(16) +
-				Movex12PasswordCipher(strPassword).PadRight(13) +
-				strProgram.PadRight(32);
+				username.PadRight(16) +
+				Movex12PasswordCipher(password).PadRight(13) +
+				program.PadRight(32);
 
 			string strReceived = Execute(strCommand.ToUpper(), false);
 
 			if (strReceived != "Connection accepted")
 				throw new MvxSckException("Login unsuccessful.", new Exception(strReceived));
 
-			_blnLoggedIn = true;
+			_logged_in = true;
 		}
 
 		/// <summary>
 		/// Alpha! (untested)
 		/// Generates a Movex 12 compatible password.
 		/// </summary>
-		/// <param name="strPassword">The password in clear text.</param>
+		/// <param name="password">The password in clear text.</param>
 		/// <returns>The ciphered password.</returns>
-		public static string Movex12PasswordCipher(string strPassword)
+		public static string Movex12PasswordCipher(string password)
 		{
 			/*
 			 *
@@ -396,25 +409,38 @@ namespace MvxLib
 			 */
 
 			byte bytCiphKey = 38;
-			byte[] bytCiphPass = _objEncoding.GetBytes(strPassword);
+			byte[] bytCiphPass = _encoding.GetBytes(password);
 
-			for (int i = 0; i < strPassword.Length; i++)
+			for (int i = 0; i < password.Length; i++)
 			{
 				bytCiphPass[i] ^= bytCiphKey;
 				bytCiphKey++;
 			}
 
-			return _objEncoding.GetString(bytCiphPass);
+			return _encoding.GetString(bytCiphPass);
 		}
 
 		/// <summary>
 		/// Fires OnTraceWrite after writing to the TraceLog.
 		/// </summary>
-		/// <param name="strMessage">The trace-message.</param>
-		private void WriteTrace(string strMessage)
+		/// <param name="message">The trace-message.</param>
+		private void WriteTrace(string message)
 		{
-			_objTraceLog.WriteTrace(strMessage);
-			TraceWrite(new EventArgs());
+			WriteTrace(message, false);
+		}
+
+		/// <summary>
+		/// Fires OnTraceWrite after writing to the TraceLog.
+		/// </summary>
+		/// <param name="message">The trace-message.</param>
+		/// <param name="force_write">True will force the message to be written.</param>
+		private void WriteTrace(string message, bool force_write)
+		{
+			if (_write_tracelog || force_write)
+			{
+				_tracelog.WriteTrace(message);
+				TraceWrite(new EventArgs());
+			}
 		}
 
 		/// <summary>
@@ -423,7 +449,7 @@ namespace MvxLib
 		/// <param name="ex">An exception to write.</param>
 		private void WriteTrace(Exception ex)
 		{
-			_objTraceLog.WriteTrace(ex);
+			_tracelog.WriteTrace(ex);
 			TraceWrite(new EventArgs());
 		}
 	}

@@ -27,43 +27,43 @@ namespace MvxLib
 {
 	public class MvxSckReturnBuilder
 	{
-		private string		_strCommandReturnString;
-		private ArrayList	_objReturnValues;
-		private int			_intCurPos;
+		private string		_return;
+		private ArrayList	_return_values;
+		private int			_cur_pos;
 
 		public string[] ReturnValues
 		{
-			get { return (string[]) _objReturnValues.ToArray(typeof(string)); }
+			get { return (string[]) _return_values.ToArray(typeof(string)); }
 		}
 
 		public string CommandStringLeft
 		{
-			get { return _strCommandReturnString.Substring(_intCurPos); }
+			get { return _return.Substring(_cur_pos); }
 		}
 
-		public MvxSckReturnBuilder(string strCommandReturnString)
+		public MvxSckReturnBuilder(string returned_string)
 		{
-			_strCommandReturnString = strCommandReturnString;
-			_objReturnValues = new ArrayList();
-			_intCurPos = 0;
+			_return = returned_string;
+			_return_values = new ArrayList();
+			_cur_pos = 0;
 		}
 
-		public string GetString(int intLength)
+		public string GetString(int length)
 		{
-			string strReturn = _strCommandReturnString.Substring(_intCurPos, intLength).Trim();
-			_intCurPos += intLength;
-			_objReturnValues.Add(strReturn);
+			string strReturn = _return.Substring(_cur_pos, length).Trim();
+			_cur_pos += length;
+			_return_values.Add(strReturn);
 			return strReturn;
 		}
 
-		public double GetDouble(int intLength)
+		public double GetDouble(int length)
 		{
-			string strReturn = GetString(intLength);
+			string ret = GetString(length);
 
-			if (strReturn == "")
+			if (ret == "")
 				return 0;
 
-			return Convert.ToDouble(strReturn, System.Globalization.CultureInfo.InvariantCulture);
+			return Convert.ToDouble(ret, System.Globalization.CultureInfo.InvariantCulture);
 		}
 
 		public bool GetBool()
@@ -74,9 +74,9 @@ namespace MvxLib
 				return false;
 		}
 
-		public int GetInt(int intLength)
+		public int GetInt(int length)
 		{
-			string strReturn = GetString(intLength);
+			string strReturn = GetString(length);
 
 			if (strReturn == "")
 				return 0;
