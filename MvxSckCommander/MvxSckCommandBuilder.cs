@@ -63,12 +63,6 @@ namespace MvxLib
 
 		public void Add(double parameter, int length)
 		{
-			if (parameter == double.NaN)
-			{
-				Add(string.Empty, length);
-				return;
-			}
-
 			const int NUMERIC_PRECISION = 6;
 
 			Add(parameter.ToString("0." + string.Empty.PadRight(NUMERIC_PRECISION, '#'), System.Globalization.CultureInfo.InvariantCulture), length);
