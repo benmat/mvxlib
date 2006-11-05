@@ -50,10 +50,10 @@ namespace MvxLib
 
 		public string GetString(int length)
 		{
-			string strReturn = _return.Substring(_cur_pos, length).Trim();
+			string ret = _return.Substring(_cur_pos, length).Trim();
 			_cur_pos += length;
-			_return_values.Add(strReturn);
-			return strReturn;
+			_return_values.Add(ret);
+			return ret;
 		}
 
 		public double GetDouble(int length)
@@ -76,12 +76,12 @@ namespace MvxLib
 
 		public int GetInt(int length)
 		{
-			string strReturn = GetString(length);
+			string ret = GetString(length);
 
-			if (strReturn == "")
+			if (ret == "")
 				return 0;
 
-			return Convert.ToInt32(strReturn);
+			return Convert.ToInt32(ret);
 		}
 	}
 }

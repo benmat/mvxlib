@@ -34,26 +34,26 @@ namespace MvxLib
 			public bool		EmptyPrice;
 
 			public PriceItem(
-				double	dblPrice,
-				int		intStaggerQuantity,
-				bool	blnEmptyPrice
+				double	price,
+				int		stagger_quantity,
+				bool	empty_price
 				)
 			{
-				this.Price				= dblPrice;
-				this.StaggerQuantity	= intStaggerQuantity;
-				this.EmptyPrice			= blnEmptyPrice;
+				this.Price				= price;
+				this.StaggerQuantity	= stagger_quantity;
+				this.EmptyPrice			= empty_price;
 			}
 		}
 
-		public static PriceItem GetPriceItem(string strCommandReturn)
+		public static PriceItem GetPriceItem(string returned)
 		{
-			MvxSckReturnBuilder objRb = new MvxSckReturnBuilder(strCommandReturn);
-			objRb.GetString(69);
-			double dblPrice = objRb.GetDouble(10);
-			objRb.GetString(8);
-			int intStaggerQuantity = objRb.GetInt(3);
+			MvxSckReturnBuilder rb = new MvxSckReturnBuilder(returned);
+			rb.GetString(69);
+			double price = rb.GetDouble(10);
+			rb.GetString(8);
+			int stagger_quantity = rb.GetInt(3);
 
-			return new PriceItem(dblPrice, intStaggerQuantity == 0 ? 1 : intStaggerQuantity, objRb.ReturnValues[1] == "");
+			return new PriceItem(price, stagger_quantity == 0 ? 1 : stagger_quantity, rb.ReturnValues[1] == "");
 		}
 
 		public struct PriceLineItem
@@ -62,22 +62,22 @@ namespace MvxLib
 			public bool		EmptyPrice;
 
 			public PriceLineItem(
-				double	dblPrice,
-				bool	blnEmptyPrice
+				double	price,
+				bool	empty_price
 				)
 			{
-				this.Price		= dblPrice;
-				this.EmptyPrice	= blnEmptyPrice;
+				this.Price		= price;
+				this.EmptyPrice	= empty_price;
 			}
 		}
 
-		public static PriceLineItem GetPriceLineItem(string strCommandReturn)
+		public static PriceLineItem GetPriceLineItem(string returned)
 		{
-			MvxSckReturnBuilder objRb = new MvxSckReturnBuilder(strCommandReturn);
-			objRb.GetString(18);
-			double dblPrice = objRb.GetDouble(15);
+			MvxSckReturnBuilder rb = new MvxSckReturnBuilder(returned);
+			rb.GetString(18);
+			double price = rb.GetDouble(15);
 
-			return new PriceLineItem(dblPrice, objRb.ReturnValues[1] == "");
+			return new PriceLineItem(price, rb.ReturnValues[1] == "");
 		}
 
 		public struct PriceMLineItem
@@ -92,57 +92,57 @@ namespace MvxLib
 			public bool		Error;
 
 			public PriceMLineItem(
-				string	strItemNumber,
-				double	dblSalesprice,
-				bool	blnEmptyPrice,
-				double	dblLineAmount,
-				double	dblOrderQuantity,
-				string	strPricelist,
-				bool	blnScaledPricelist,
-				bool	blnError
+				string	item,
+				double	sales_price,
+				bool	empty_price,
+				double	line_amount,
+				double	order_quantity,
+				string	pricelist,
+				bool	scaled_pricelist,
+				bool	error
 				)
 			{
-				this.ItemNumber			= strItemNumber;
-				this.Salesprice			= dblSalesprice;
-				this.EmptyPrice			= blnEmptyPrice;
-				this.LineAmount			= dblLineAmount;
-				this.OrderQuantity		= dblOrderQuantity;
-				this.Pricelist			= strPricelist;
-				this.ScaledPricelist	= blnScaledPricelist;
-				this.Error				= blnError;
+				this.ItemNumber			= item;
+				this.Salesprice			= sales_price;
+				this.EmptyPrice			= empty_price;
+				this.LineAmount			= line_amount;
+				this.OrderQuantity		= order_quantity;
+				this.Pricelist			= pricelist;
+				this.ScaledPricelist	= scaled_pricelist;
+				this.Error				= error;
 			}
 		}
 
-		public static PriceMLineItem[] GetPriceMLineItems(string strCommandReturn)
+		public static PriceMLineItem[] GetPriceMLineItems(string returned)
 		{
-			ArrayList arrReturnItems = new ArrayList();
-			MvxSckReturnBuilder objRb = new MvxSckReturnBuilder(strCommandReturn.Trim());
-			objRb.GetString(15); // Return code
+			ArrayList ret = new ArrayList();
+			MvxSckReturnBuilder rb = new MvxSckReturnBuilder(returned.Trim());
+			rb.GetString(15); // Return code
 
-			while (objRb.CommandStringLeft != "FINITO" && objRb.CommandStringLeft.Length > 0)
+			while (rb.CommandStringLeft != "FINITO" && rb.CommandStringLeft.Length > 0)
 			{
-				string strItemNumber		= objRb.GetString(15);
-				bool blnEmptyPrice			= objRb.CommandStringLeft.Substring(0, 15).Trim() == "";
-				double dblPrice				= objRb.GetDouble(15);
-				double dblLineAmount		= objRb.GetDouble(15);
-				double dblOrderQuantity		= objRb.GetDouble(15);
-				string strPricelist			= objRb.GetString(2);
-				bool blnScaledPricelist		= objRb.GetBool();
-				bool blnError				= objRb.GetBool();
+				string item		= rb.GetString(15);
+				bool empty_price		= rb.CommandStringLeft.Substring(0, 15).Trim() == "";
+				double price			= rb.GetDouble(15);
+				double line_amount		= rb.GetDouble(15);
+				double order_quantity	= rb.GetDouble(15);
+				string pricelist		= rb.GetString(2);
+				bool scaled_pricelist	= rb.GetBool();
+				bool error				= rb.GetBool();
 
-				arrReturnItems.Add(new PriceMLineItem(
-					strItemNumber,
-					dblPrice,
-					blnEmptyPrice,
-					dblLineAmount,
-					dblOrderQuantity,
-					strPricelist,
-					blnScaledPricelist,
-					blnError
+				ret.Add(new PriceMLineItem(
+					item,
+					price,
+					empty_price,
+					line_amount,
+					order_quantity,
+					pricelist,
+					scaled_pricelist,
+					error
 					));
 			}
 
-			return (PriceMLineItem[]) arrReturnItems.ToArray(typeof(PriceMLineItem));
+			return (PriceMLineItem[]) ret.ToArray(typeof(PriceMLineItem));
 		}
 	}
 }
