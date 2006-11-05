@@ -43,12 +43,12 @@ namespace MvxLib
 		/// <returns>All TraceLogEntries concatenated.</returns>
 		public override string ToString()
 		{
-			string strReturn = string.Empty;
+			string ret = string.Empty;
 
 			for (int i = 0; i < Entries.Length; i++)
-				strReturn += Entries[i].ToString() + Environment.NewLine;
+				ret += Entries[i].ToString() + Environment.NewLine;
 
-			return strReturn;
+			return ret;
 		}
 
 		/// <summary>

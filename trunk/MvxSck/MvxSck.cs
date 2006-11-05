@@ -287,11 +287,11 @@ namespace MvxLib
 
 			if (command != null)
 			{
-				byte[] baSend = AddCommandLengthPrefix(command);
+				byte[] send = AddCommandLengthPrefix(command);
 			
 				WriteTrace("Sending command through socket.");
 
-				_socket.Send(baSend, baSend.Length, SocketFlags.None);
+				_socket.Send(send, send.Length, SocketFlags.None);
 			}
 
 			int count_received = 0, count_total_received = 0;
@@ -334,12 +334,12 @@ namespace MvxLib
 		{
 			WriteTrace("Entering AddCommandLengthPrefix().");
 
-			byte[] bcCommand = _encoding.GetBytes("\x00\x00\x01\x01" + command);
+			byte[] ret = _encoding.GetBytes("\x00\x00\x01\x01" + command);
 
-			bcCommand[2] = Convert.ToByte(command.Length / 256);
-			bcCommand[3] = Convert.ToByte(command.Length % 256);
+			ret[2] = Convert.ToByte(command.Length / 256);
+			ret[3] = Convert.ToByte(command.Length % 256);
 
-			return bcCommand;
+			return ret;
 		}
 
 		/// <summary>
@@ -353,17 +353,17 @@ namespace MvxLib
 		{
 			WriteTrace(String.Format("Entering Login(). Parameters: username = {0}, password = {1}, library = {2}, program = {3}", username, password, library, program));
 
-			string strCommand = "LOGON" + 
+			string command = "LOGON" + 
 				Environment.MachineName.PadRight(32) +
 				username.PadRight(16) +
 				password.PadRight(16) +
 				(library + "/" + program).PadRight(32) +
 				program.PadRight(32);
 
-			string strReceived = Execute(strCommand.ToUpper(), false);
+			string received = Execute(command.ToUpper(), false);
 
-			if (strReceived != "Connection accepted")
-				throw new MvxSckException("Login unsuccessful.", new Exception(strReceived));
+			if (received != "Connection accepted")
+				throw new MvxSckException("Login unsuccessful.", new Exception(received));
 
 			_logged_in = true;
 		}
@@ -379,16 +379,16 @@ namespace MvxLib
 		{
 			WriteTrace(String.Format("Entering LoginMovex12(). Parameters: username = {0}, password = {1}, program = {2}", username, password, program));
 
-			string strCommand = "PWLOG" +
+			string command = "PWLOG" +
 				Environment.MachineName.PadRight(32) +
 				username.PadRight(16) +
 				Movex12PasswordCipher(password).PadRight(13) +
 				program.PadRight(32);
 
-			string strReceived = Execute(strCommand.ToUpper(), false);
+			string received = Execute(command.ToUpper(), false);
 
-			if (strReceived != "Connection accepted")
-				throw new MvxSckException("Login unsuccessful.", new Exception(strReceived));
+			if (received != "Connection accepted")
+				throw new MvxSckException("Login unsuccessful.", new Exception(received));
 
 			_logged_in = true;
 		}
@@ -408,16 +408,16 @@ namespace MvxLib
 			 *
 			 */
 
-			byte bytCiphKey = 38;
-			byte[] bytCiphPass = _encoding.GetBytes(password);
+			byte key = 38;
+			byte[] pass = _encoding.GetBytes(password);
 
 			for (int i = 0; i < password.Length; i++)
 			{
-				bytCiphPass[i] ^= bytCiphKey;
-				bytCiphKey++;
+				pass[i] ^= key;
+				key++;
 			}
 
-			return _encoding.GetString(bytCiphPass);
+			return _encoding.GetString(pass);
 		}
 
 		/// <summary>
@@ -470,9 +470,9 @@ namespace MvxLib
 		/// Exception thrown from MvxSck.
 		/// </summary>
 		/// <param name="message">Errormessage.</param>
-		/// <param name="innerException">Inner exception, the exception that caused the outer exception.</param>
-		public MvxSckException(string message, Exception innerException)
-			: base(message, innerException)
+		/// <param name="inner_exception">Inner exception, the exception that caused the outer exception.</param>
+		public MvxSckException(string message, Exception inner_exception)
+			: base(message, inner_exception)
 		{
 		}
 	}
