@@ -64,6 +64,9 @@ SET DEBUG=/debug+
 
 :endset_debug
 
+:: Suppress missing XML-comment warnings
+SET COMPILER=%COMPILER% /nowarn:1591
+
 ECHO.
 CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.dll /doc:Bin\MvxLib.xml *.cs %DEBUG%
 

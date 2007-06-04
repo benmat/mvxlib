@@ -48,8 +48,10 @@ namespace MvxLib
 		private IPEndPoint	_host			= null;
 		private string		_server			= null;
 		private int			_port			= 0;
+#if NET_2_0
 		private const int	RECEIVE_TIMEOUT	= 30000;
 		private const int	SEND_TIMEOUT	= 2000;
+#endif
 		private TraceLog	_tracelog		= new TraceLog();
 		private bool		_write_tracelog	= false;
 
@@ -70,6 +72,7 @@ namespace MvxLib
 			get { return _logged_in; }
 		}
 
+#if NET_2_0
 		/// <summary>
 		/// Gets or sets the timeout for the amount of milliseconds to wait
 		/// for Movex to return a value.
@@ -89,6 +92,7 @@ namespace MvxLib
 					_socket.ReceiveTimeout = value;
 			}
 		}
+#endif
 
 		/// <summary>
 		/// Gets the TraceLog. Only written to if WriteTraceLog is set to true.
@@ -161,8 +165,10 @@ namespace MvxLib
 			WriteTrace("Constructing Socket-object.");
 
 			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+#if NET_2_0
 			_socket.SendTimeout = SEND_TIMEOUT;
 			_socket.ReceiveTimeout = RECEIVE_TIMEOUT;
+#endif
 
 			if (_host != null)
 			{

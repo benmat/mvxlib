@@ -22,11 +22,6 @@
  */
 using System;
 
-#if NET_2_0
-// Disable warnings of missing XML comments in this class.
-#pragma warning disable 1591,1592,1573,1571,1570,1572
-#endif
-
 namespace MvxLib
 {
 	public class MvxSckCommand
