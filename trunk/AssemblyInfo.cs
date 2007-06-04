@@ -3,7 +3,7 @@
  * MvxLib, an open source C# library used for communication with Intentia Movex.
  * http://mvxlib.sourceforge.net
  *
- * Copyright (C) 2005 - 2006  Mattias Bengtsson
+ * Copyright (C) 2005 - 2007  Mattias Bengtsson
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
