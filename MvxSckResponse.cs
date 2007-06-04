@@ -23,9 +23,12 @@
 using System;
 using System.Collections;
 
+// Disable warnings of missing XML comments in this class.
+#pragma warning disable 1591,1592,1573,1571,1570,1572
+
 namespace MvxLib
 {
-	public class MvxSckReturn
+	public class MvxSckResponse
 	{
 		public struct PriceItem
 		{
@@ -47,13 +50,13 @@ namespace MvxLib
 
 		public static PriceItem GetPriceItem(string returned)
 		{
-			MvxSckReturnBuilder rb = new MvxSckReturnBuilder(returned);
+			MvxSckResponseBuilder rb = new MvxSckResponseBuilder(returned);
 			rb.GetString(69);
 			double price = rb.GetDouble(10);
 			rb.GetString(8);
 			int stagger_quantity = rb.GetInt(3);
 
-			return new PriceItem(price, stagger_quantity == 0 ? 1 : stagger_quantity, rb.ReturnValues[1] == "");
+			return new PriceItem(price, stagger_quantity == 0 ? 1 : stagger_quantity, rb.ResponseValues[1] == "");
 		}
 
 		public struct PriceLineItem
@@ -73,11 +76,11 @@ namespace MvxLib
 
 		public static PriceLineItem GetPriceLineItem(string returned)
 		{
-			MvxSckReturnBuilder rb = new MvxSckReturnBuilder(returned);
+			MvxSckResponseBuilder rb = new MvxSckResponseBuilder(returned);
 			rb.GetString(18);
 			double price = rb.GetDouble(15);
 
-			return new PriceLineItem(price, rb.ReturnValues[1] == "");
+			return new PriceLineItem(price, rb.ResponseValues[1] == "");
 		}
 
 		public struct PriceMLineItem
@@ -116,13 +119,13 @@ namespace MvxLib
 		public static PriceMLineItem[] GetPriceMLineItems(string returned)
 		{
 			ArrayList ret = new ArrayList();
-			MvxSckReturnBuilder rb = new MvxSckReturnBuilder(returned.Trim());
+			MvxSckResponseBuilder rb = new MvxSckResponseBuilder(returned.Trim());
 			rb.GetString(15); // Return code
 
-			while (rb.CommandStringLeft != "FINITO" && rb.CommandStringLeft.Length > 0)
+			while (rb.RemainingResponse != "FINITO" && rb.RemainingResponse.Length > 0)
 			{
-				string item		= rb.GetString(15);
-				bool empty_price		= rb.CommandStringLeft.Substring(0, 15).Trim() == "";
+				string item				= rb.GetString(15);
+				bool empty_price		= rb.RemainingResponse.Substring(0, 15).Trim() == "";
 				double price			= rb.GetDouble(15);
 				double line_amount		= rb.GetDouble(15);
 				double order_quantity	= rb.GetDouble(15);

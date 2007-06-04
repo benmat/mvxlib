@@ -24,15 +24,25 @@ using System;
 
 namespace MvxLib
 {
+	/// <summary>
+	/// This class will help you create command-strings.
+	/// </summary>
 	public class MvxSckCommandBuilder
 	{
 		private string _command;
 
+		/// <summary>
+		/// Gets the command.
+		/// </summary>
 		public string Command
 		{
 			get { return _command; }
 		}
 
+		/// <summary>
+		/// Creates an instance.
+		/// </summary>
+		/// <param name="program">The MI-program to execute.</param>
 		public MvxSckCommandBuilder(string program)
 		{
 			const int PROGRAM_LENGTH = 15;
@@ -43,6 +53,11 @@ namespace MvxLib
 			_command = program.PadRight(PROGRAM_LENGTH, ' ');
 		}
 
+		/// <summary>
+		/// Adds a parameter to the command.
+		/// </summary>
+		/// <param name="parameter">The value of type <code>string</code>.</param>
+		/// <param name="length">The length of <para>parameter</para>.</param>
 		public void Add(string parameter, int length)
 		{
 			if (parameter.Length > length)
@@ -51,16 +66,30 @@ namespace MvxLib
 			_command += parameter.PadRight(length, ' ');
 		}
 
+		/// <summary>
+		/// Adds a parameter to the command.
+		/// </summary>
+		/// <param name="parameter">The value of type <code>int</code>.</param>
+		/// <param name="length">The length of <para>parameter</para>.</param>
 		public void Add(int parameter, int length)
 		{
 			Add(parameter.ToString(), length);
 		}
 
+		/// <summary>
+		/// Adds a parameter to the command.
+		/// </summary>
+		/// <param name="parameter">The value of type <code>DateTime</code>.</param>
 		public void Add(DateTime parameter)
 		{
 			Add(parameter.ToString("yyyyMMdd"), 10);
 		}
 
+		/// <summary>
+		/// Adds a parameter to the command.
+		/// </summary>
+		/// <param name="parameter">The value of type <code>double</code>.</param>
+		/// <param name="length">The length of <para>parameter</para>.</param>
 		public void Add(double parameter, int length)
 		{
 			const int NUMERIC_PRECISION = 6;

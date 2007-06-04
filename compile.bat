@@ -65,8 +65,7 @@ SET DEBUG=/debug+
 :endset_debug
 
 ECHO.
-CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.MvxSck.dll /doc:Bin\MvxLib.MvxSck.xml MvxSck\*.cs %DEBUG%
-CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.MvxSckCommander.dll MvxSckCommander\*.cs %DEBUG%
+CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.dll /doc:Bin\MvxLib.xml *.cs %DEBUG%
 
 IF ERRORLEVEL 1 GOTO ERR
 

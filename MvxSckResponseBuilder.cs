@@ -25,37 +25,60 @@ using System.Collections;
 
 namespace MvxLib
 {
-	public class MvxSckReturnBuilder
+	/// <summary>
+	/// This class will help you format response-strings.
+	/// </summary>
+	public class MvxSckResponseBuilder
 	{
-		private string		_return;
-		private ArrayList	_return_values;
+		private string		_response;
+		private ArrayList	_response_values;
 		private int			_cur_pos;
 
-		public string[] ReturnValues
+		/// <summary>
+		/// Gets the response-values as a string-array.
+		/// </summary>
+		public string[] ResponseValues
 		{
-			get { return (string[]) _return_values.ToArray(typeof(string)); }
+			get { return (string[]) _response_values.ToArray(typeof(string)); }
 		}
 
-		public string CommandStringLeft
+		/// <summary>
+		/// Gets the remaining commandstring that is not parsed.
+		/// </summary>
+		public string RemainingResponse
 		{
-			get { return _return.Substring(_cur_pos); }
+			get { return _response.Substring(_cur_pos); }
 		}
 
-		public MvxSckReturnBuilder(string returned_string)
+		/// <summary>
+		/// Creates an instance.
+		/// </summary>
+		/// <param name="response">The response-string Movex returned.</param>
+		public MvxSckResponseBuilder(string response)
 		{
-			_return = returned_string;
-			_return_values = new ArrayList();
+			_response = response;
+			_response_values = new ArrayList();
 			_cur_pos = 0;
 		}
 
+		/// <summary>
+		/// Parses the next value of the response.
+		/// </summary>
+		/// <param name="length">The expected length of the value.</param>
+		/// <returns>The parsed value.</returns>
 		public string GetString(int length)
 		{
-			string ret = _return.Substring(_cur_pos, length).Trim();
+			string ret = _response.Substring(_cur_pos, length).Trim();
 			_cur_pos += length;
-			_return_values.Add(ret);
+			_response_values.Add(ret);
 			return ret;
 		}
 
+		/// <summary>
+		/// Parses the next value of the response.
+		/// </summary>
+		/// <param name="length">The expected length of the value.</param>
+		/// <returns>The parsed value.</returns>
 		public double GetDouble(int length)
 		{
 			string ret = GetString(length);
@@ -66,6 +89,10 @@ namespace MvxLib
 			return Convert.ToDouble(ret, System.Globalization.CultureInfo.InvariantCulture);
 		}
 
+		/// <summary>
+		/// Parses the next value of the response.
+		/// </summary>
+		/// <returns>The parsed value.</returns>
 		public bool GetBool()
 		{
 			if (GetString(1) == "1")
@@ -74,6 +101,11 @@ namespace MvxLib
 				return false;
 		}
 
+		/// <summary>
+		/// Parses the next value of the response.
+		/// </summary>
+		/// <param name="length">The expected length of the value.</param>
+		/// <returns>The parsed value.</returns>
 		public int GetInt(int length)
 		{
 			string ret = GetString(length);

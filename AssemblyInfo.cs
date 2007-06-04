@@ -23,8 +23,8 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyTitle("MvxSckCommander")]
-[assembly: AssemblyDescription("A library designed to handle commands and strings to and from MvxSck.")]
+[assembly: AssemblyTitle("MvxLib")]
+[assembly: AssemblyDescription("A free C# implementation of MvxSockX. Provides an API to communicate with Intentia Movex MI-programs via the FPW-service.")]
 [assembly: AssemblyCompany("")]
 
 #if MONO
@@ -38,10 +38,10 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("Compiled with Microsoft .NET Framework 1.1")]
 #endif
 
-[assembly: AssemblyCopyright("Copyright (C) 2005 - 2006  Mattias Bengtsson")]
+[assembly: AssemblyCopyright("Copyright (C) 2005 - 2007  Mattias Bengtsson")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]		
-[assembly: AssemblyVersion("0.2.*")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.3.*")]
 [assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyKeyFile("")]
 [assembly: AssemblyKeyName("")]
