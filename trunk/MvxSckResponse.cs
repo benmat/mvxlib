@@ -21,7 +21,6 @@
  *
  */
 using System;
-using System.Collections;
 
 namespace MvxLib
 {
@@ -78,71 +77,6 @@ namespace MvxLib
 			double price = rb.GetDouble(15);
 
 			return new PriceLineItem(price, rb.ResponseValues[1] == "");
-		}
-
-		public struct PriceMLineItem
-		{
-			public string	ItemNumber;
-			public double	Salesprice;
-			public bool		EmptyPrice;
-			public double	LineAmount;
-			public double	OrderQuantity;
-			public string	Pricelist;
-			public bool		ScaledPricelist;
-			public bool		Error;
-
-			public PriceMLineItem(
-				string	item,
-				double	sales_price,
-				bool	empty_price,
-				double	line_amount,
-				double	order_quantity,
-				string	pricelist,
-				bool	scaled_pricelist,
-				bool	error
-				)
-			{
-				this.ItemNumber			= item;
-				this.Salesprice			= sales_price;
-				this.EmptyPrice			= empty_price;
-				this.LineAmount			= line_amount;
-				this.OrderQuantity		= order_quantity;
-				this.Pricelist			= pricelist;
-				this.ScaledPricelist	= scaled_pricelist;
-				this.Error				= error;
-			}
-		}
-
-		public static PriceMLineItem[] GetPriceMLineItems(string returned)
-		{
-			ArrayList ret = new ArrayList();
-			MvxSckResponseBuilder rb = new MvxSckResponseBuilder(returned.Trim());
-			rb.GetString(15); // Return code
-
-			while (rb.RemainingResponse != "FINITO" && rb.RemainingResponse.Length > 0)
-			{
-				string item				= rb.GetString(15);
-				bool empty_price		= rb.RemainingResponse.Substring(0, 15).Trim() == "";
-				double price			= rb.GetDouble(15);
-				double line_amount		= rb.GetDouble(15);
-				double order_quantity	= rb.GetDouble(15);
-				string pricelist		= rb.GetString(2);
-				bool scaled_pricelist	= rb.GetBool();
-				bool error				= rb.GetBool();
-
-				ret.Add(new PriceMLineItem(
-					item,
-					price,
-					empty_price,
-					line_amount,
-					order_quantity,
-					pricelist,
-					scaled_pricelist,
-					error
-					));
-			}
-
-			return (PriceMLineItem[]) ret.ToArray(typeof(PriceMLineItem));
 		}
 	}
 }

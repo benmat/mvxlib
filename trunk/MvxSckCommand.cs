@@ -114,63 +114,6 @@ namespace MvxLib
 			cb.Add(pricelist, 2);
 			return cb.Command;
 		}
-
-		public struct GetPriceMLineItem
-		{
-			public string	ItemNumber;
-			public string	Warehouse;
-			public double	Quantity;
-			public string	UnitOfMeasure;
-
-			public GetPriceMLineItem(string item, string warehouse, double quantity, string unit_of_measure)
-			{
-				this.ItemNumber		= item;
-				this.Warehouse		= warehouse;
-				this.Quantity		= quantity;
-				this.UnitOfMeasure	= unit_of_measure;
-			}
-		}
-
-		public static string GetPriceMLine(
-			int			company,
-			string		facility,
-			string		customer,
-			DateTime	order_date,
-			string		currency,
-			string		ordertype,
-			string		pricelist,
-			string		discount_model,
-			DateTime	date,
-			GetPriceMLineItem[] items
-			)
-		{
-			if (items.Length == 0)
-				throw new ApplicationException("No items specified.");
-
-			if (items.Length > 39)
-				throw new ApplicationException("Too many items specified. Only 39 is allowed.");
-
-			MvxSckCommandBuilder cb = new MvxSckCommandBuilder("GetPriceMLine");
-			cb.Add(company, 3);
-			cb.Add(facility, 3);
-			cb.Add(customer, 10);
-			cb.Add(order_date);
-			cb.Add(currency, 3);
-			cb.Add(ordertype, 3);
-			cb.Add(pricelist, 2);
-			cb.Add(discount_model, 10);
-			cb.Add(date);
-
-			for (int i = 0; i < items.Length && i < 39; i++)
-			{
-				cb.Add(items[i].ItemNumber.ToUpper(), 15);
-				cb.Add(items[i].Warehouse, 3);
-				cb.Add(items[i].Quantity, 16);
-				cb.Add(items[i].UnitOfMeasure, 3);
-			}
-
-			return cb.Command;
-		}
 		#endregion
 
 		#region Orders
