@@ -36,26 +36,25 @@ this class provides functions to parse response-strings and is mainly used by Mv
 Example code in C# using MvxLib. This shows how you could use MvxLib to connect, send a command and retreive the response-message.
 
 ```
-string s_host = "MVXHST";
-int s_ip = 6012;
-
-string s_user = "USRNME";
-string s_pass = "THEPWD";
-string s_libr = "MVXTST";
-string s_prgm = "OIS320MI";
+string host = "MVXHST";
+int ip = 6012;
+string user = "USRNME";
+string pass = "THEPWD";
+string libr = "MVXTST";
+string prgm = "OIS320MI";
 
 MvxSck conn = null;
 
 try
 {
     // Open connection to Movex
-    conn = new MvxSck(s_host, s_ip);
+    conn = new MvxSck(host, ip);
     conn.Connect();
     conn.Login(
-        s_user,
-        s_pass,
-        s_libr,
-        s_prgm);
+        user,
+        pass,
+        libr,
+        prgm);
 
     // Prepare command to send, notice the use of datatypes (not just strings)
     string cmd = MvxSckCommand.GetPriceLine(
@@ -74,8 +73,8 @@ try
     // Run command; get response
     string ret = conn.Execute(cmd);
 
-    MvxSckResponse.PriceLineItem ret_obj = MvxSckResponse.GetPriceLineItem(ret);
-    // ret_obj contains all the returned information parsed and packaged
+    MvxSckResponse.PriceLineItem retObj = MvxSckResponse.GetPriceLineItem(ret);
+    // retObj contains all the returned information parsed and packaged
 }
 catch (MvxSckException ex)
 {
