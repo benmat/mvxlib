@@ -30,7 +30,8 @@ this class provides functions to build command-strings in a controlled manor, it
 methods in this class are used to parse common MI-program response-strings
 * **MvxSckResponseBuilder** - 
 this class provides functions to parse response-strings and is mainly used by MvxSckResponse
-Example code
+
+## Example code
 
 Example code in C# using MvxLib. This shows how you could use MvxLib to connect, send a command and retreive the response-message.
 
