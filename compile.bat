@@ -23,16 +23,18 @@
 
 IF "%1" == "11" GOTO set_11		rem Ms .NET 1.1
 IF "%1" == "20" GOTO set_20		rem Ms .NET 2.0
+IF "%1" == "40" GOTO set_40		rem Ms .NET 4.0
 IF "%1" == "mono" GOTO set_mono	rem Mono
 
 ECHO  Compiler argument empty or incorrect (remember to use lowercase).
 ECHO  Use 'compile arg' where arg can be:
 ECHO  	'11'	for Microsoft .NET 1.1
 ECHO  	'20'	for Microsoft .NET 2.0
+ECHO  	'40'	for Microsoft .NET 4.0
 ECHO  	'mono'	for Mono
 ECHO.
 
-GOTO set_20
+GOTO set_40
 
 :set_11
 ECHO  Using .Net Framework 1.1 compiler.
@@ -43,6 +45,12 @@ GOTO endset
 :set_20
 ECHO  Using .Net Framework 2.0 compiler.
 SET DOTNET_VERSION=v2.0.50727
+SET DEFINE=NET_2_0
+GOTO endset
+
+:set_40
+ECHO  Using .Net Framework 4.0 compiler.
+SET DOTNET_VERSION=v4.0.30319
 SET DEFINE=NET_2_0
 GOTO endset
 
