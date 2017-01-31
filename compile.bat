@@ -68,7 +68,9 @@ SET DEBUG=/debug+
 SET COMPILER=%COMPILER% /nowarn:1591
 
 ECHO.
-CALL %COMPILER% /define:%DEFINE% /target:library /out:Bin\MvxLib.dll /doc:Bin\MvxLib.xml *.cs %DEBUG%
+SET BINDIR=Bin\
+IF NOT EXIST %BINDIR% MKDIR %BINDIR%
+CALL %COMPILER% /define:%DEFINE% /target:library /out:%BINDIR%MvxLib.dll /doc:%BINDIR%MvxLib.xml *.cs %DEBUG%
 
 IF ERRORLEVEL 1 GOTO ERR
 
